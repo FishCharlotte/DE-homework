@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.js": "/MDE20/DE-homework/static/js/main.f36b5291.js",
-    "index.html": "/MDE20/DE-homework/index.html",
-    "main.f36b5291.js.map": "/MDE20/DE-homework/static/js/main.f36b5291.js.map"
+    "main.js": "/DE-homework/static/js/main.f36b5291.js",
+    "index.html": "/DE-homework/index.html",
+    "main.f36b5291.js.map": "/DE-homework/static/js/main.f36b5291.js.map"
   },
   "entrypoints": [
     "static/js/main.f36b5291.js"
