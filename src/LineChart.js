@@ -178,24 +178,22 @@ const ChartComponent = (props) => {
                     if (data) {
                         results.push([item.title, data.value, item.color]);
 
-                        const isValidHover = param.seriesData.has(item.series) && data.value !== undefined;
+                        const formattedParamDate = formatDate(param.time); // 格式化悬浮时间
 
-                        if (isValidHover) {
-                            const formattedParamDate = formatDate(param.time); // 格式化悬浮时间
-                        
-                            const eventInfo = impactfulEvents.find(event => {
-                                const eventDate = formatDate(new Date(event.date).getTime() / 1000); // 格式化事件日期
-                                return eventDate === formattedParamDate; // 比较格式化后的日期
-                            });
-                        
-                            if (eventInfo) {
-                                const match = eventInfo.event.match(/\[(.*?)\]/);
-                                const eventTitle = match ? match[1] : "Unknown Event";
-                                setTooltipEventTitle(`${eventTitle}`);
-                                setTooltipImage(eventInfo.image); // 设置图片
-                                foundEvent = true;
-                            }
+                        const eventInfo = impactfulEvents.find(event => {
+                            const eventDate = formatDate(new Date(event.date).getTime() / 1000); // 格式化事件日期
+                            return eventDate === formattedParamDate; // 比较格式化后的日期
+                        });
+                        console.log(formattedParamDate, eventInfo)
+
+                        if (eventInfo) {
+                            const match = eventInfo.event.match(/\[(.*?)\]/);
+                            const eventTitle = match ? match[1] : "Unknown Event";
+                            setTooltipEventTitle(eventTitle);
+                            setTooltipImage(eventInfo.image); // 设置图片
+                            foundEvent = true;
                         }
+
                     }
                 });
 
@@ -241,55 +239,59 @@ const ChartComponent = (props) => {
     }
 
     return (
-        <div onClick={handleClick} ref={chartContainerRef} style={{ position: 'relative' }}>
-            {canShowTooltip && (
-                <div
-                    style={{
-                        width: `${toolTipWidth}px`,
-                        height: 'auto',
-                        position: 'absolute',
-                        padding: '8px',
-                        boxSizing: 'border-box',
-                        fontSize: '12px',
-                        zIndex: 1000,
-                        top: '100px',
-                        left: tooltipX + 'px',
-                        pointerEvents: 'none',
-                        borderRadius: '4px',
-                        boxShadow: '0 2px 5px 0 rgba(117, 134, 150, 0.45)',
-                        background: 'rgba(255, 255, 255, 0.9)',
-                        color: 'black',
-                    }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ flex: 1 }}>
-                            {tooltipItems.map(([key, value, color]) => (
-                                <div key={key}>
-                                    <div style={{ color }}>{`⬤ ${key}`}</div>
-                                    <div style={{ fontSize: '16px', margin: '4px 0px' }}>
-                                        {Math.round(value * 100)}%
+        <div style={{display: 'flex', alignItems: 'center', marginTop: '30px', flexDirection: 'column', marginBottom: '10px'}}>
+            <h2>News Details</h2>
+            <div onClick={handleClick} ref={chartContainerRef} style={{position: 'relative', width: '800px'}}>
+                {canShowTooltip && (
+                    <div
+                        style={{
+                            width: `${toolTipWidth}px`,
+                            height: 'auto',
+                            position: 'absolute',
+                            padding: '8px',
+                            boxSizing: 'border-box',
+                            fontSize: '12px',
+                            zIndex: 1000,
+                            top: '100px',
+                            left: tooltipX + 'px',
+                            pointerEvents: 'none',
+                            borderRadius: '4px',
+                            boxShadow: '0 2px 5px 0 rgba(117, 134, 150, 0.45)',
+                            background: 'rgba(255, 255, 255, 0.9)',
+                            color: 'black',
+                        }}>
+                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                            <div style={{flex: 1}}>
+                                {tooltipItems.map(([key, value, color]) => (
+                                    <div key={key}>
+                                        <div style={{color}}>{`⬤ ${key}`}</div>
+                                        <div style={{fontSize: '16px', margin: '4px 0px'}}>
+                                            {Math.round(value * 100)}%
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                            {tooltipImage && (
+                                <img
+                                    src={tooltipImage}
+                                    alt="Event"
+                                    style={{width: '180px', height: '100px', marginLeft: '10px'}}
+                                />
+                            )}
                         </div>
-                        {tooltipImage && (
-                            <img 
-                                src={tooltipImage} 
-                                alt="Event" 
-                                style={{ width: '180px', height: '100px', marginLeft: '10px' }} 
-                            />
+                        {tooltipEventTitle && (
+                            <div style={{marginTop: '10px', fontWeight: 'bold'}}>
+                                {tooltipEventTitle}
+                            </div>
                         )}
-                    </div>
-                    {tooltipEventTitle && (
-                        <div style={{ marginTop: '10px', fontWeight: 'bold' }}>
-                            {tooltipEventTitle}
+                        <div>
+                            {formatDate(tooltipTime)}
                         </div>
-                    )}
-                    <div>
-                    {formatDate(tooltipTime)}
-                </div>
-                </div>
-            )}
+                    </div>
+                )}
+            </div>
         </div>
+
     );
 };
 
@@ -298,8 +300,28 @@ const LineChart = (props) => {
 
     return (
         <>
-            <ChartComponent {...props} data={datasets} setEvent={events => setNews(events)} />
-            <div>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                <iframe src='https://flo.uri.sh/visualisation/20429066/embed' title='Interactive or visual content'
+                        className='flourish-embed-iframe'
+                        frameBorder='0'
+                        style={{
+
+                            width: '800px',
+                            height: '600px'
+                        }}
+                        sandbox='allow-same-origin allow-forms allow-scripts allow-downloads allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation'></iframe>
+            </div>
+
+            <ChartComponent {...props} data={datasets} setEvent={events => setNews(events)}/>
+            <div style={{
+                width: '70%',
+                padding: '0 100px',
+                margin: '0 auto',
+            }}>
                 {news.length > 0 && news.map(item => (
                     <div key={'item-' + item["date"]}>
                         {item["date"]}
